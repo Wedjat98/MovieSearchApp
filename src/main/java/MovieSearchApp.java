@@ -83,6 +83,15 @@ public class MovieSearchApp extends Application {
             pieChartData[index[0]] = new PieChart.Data(key, value);
             index[0]++;
         });
+
+
+        searchButton.setOnAction(e->{
+            search(minRank,maxRank,minYear,maxYear);
+        });
+        resetButton.setOnAction(e->{
+            reset();
+        });
+
         pieChart.setLegendVisible(false);
         pieChart.getData().addAll(pieChartData);
         pieChart.setStartAngle(90);
