@@ -35,14 +35,15 @@ public class MovieSearchApp extends Application {
     Button resetButton = new Button("リセット");
     HBox hBox4 = new HBox(searchButton, resetButton);
     public PieChart pieChart = new PieChart();
-    VBox leftVBox = new VBox(hBox1, hBox2, hBox3, hBox4,pieChart);
+    VBox leftVBox = new VBox(hBox1, hBox2, hBox3, hBox4, pieChart);
     BorderPane bp = new BorderPane();
     TableView table = new TableView();
     ObservableList data = null;
     TreeSet<String> sites = new TreeSet<String>();
-//    Iterator<String> itr;
+    //    Iterator<String> itr;
     List<String> list = new ArrayList<>();
     int[] frequency;
+
     @Override
     public void start(Stage stage) throws Exception {
         // プログラムを作成
@@ -56,6 +57,11 @@ public class MovieSearchApp extends Application {
         hBox3.setAlignment(Pos.CENTER);
         hBox4.setAlignment(Pos.CENTER);
 
+        String minRank = textField1.getText();
+        String maxRank = textField2.getText();
+        String minYear = textField3.getText();
+        String maxYear = textField4.getText();
+
         Field f = allData.getField("data");
         String[] initData = (String[]) f.get(MovieData.data);
         Movie[] movies = new Movie[initData.length];
@@ -64,10 +70,8 @@ public class MovieSearchApp extends Application {
             String[] arr = initData[i].split(", ");
             movies[i] = new Movie(Integer.parseInt(arr[0]), arr[1], Integer.parseInt(arr[2]));
             list.add(String.valueOf(movies[i].getYear()));
-//            getYear(arr[2]);
             data = FXCollections.observableArrayList(movies);
         }
-//      itr = sites.iterator();
         Map<String, Integer> treeMap = new TreeMap();
         for (String temp : list) {
             Integer count = (Integer) treeMap.get(temp);
@@ -75,8 +79,7 @@ public class MovieSearchApp extends Application {
         }
         PieChart.Data[] pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
-        treeMap.forEach((key, value)->{
-//            System.out.println(key+"--"+value);
+        treeMap.forEach((key, value) -> {
             pieChartData[index[0]] = new PieChart.Data(key, value);
             index[0]++;
         });
@@ -90,9 +93,9 @@ public class MovieSearchApp extends Application {
         rankCol.setCellValueFactory(new PropertyValueFactory("rank"));
         yearCol.setCellValueFactory(new PropertyValueFactory("year"));
         nameCol.setCellValueFactory(new PropertyValueFactory("title"));
+        nameCol.setMinWidth(300);
         table.getColumns().addAll(rankCol, yearCol, nameCol);
         table.setItems(data);
-        nameCol.setMinWidth(300);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         VBox rightVBox = new VBox(table);
         bp.setRight(rightVBox);
@@ -101,9 +104,26 @@ public class MovieSearchApp extends Application {
         stage.show();
     }
 
-    public void getYear(String arr) {
-        sites.add(arr);
+    public void search(String s1, String s2, String s3, String s4) {
+        if (s1 == null) {
+            s1="1";
+        }
+          if (s2 == null) {
+            s1="100";
+        }
+          if (s3 == null) {
+            s1="1975";
+        }
+          if (s4 == null) {
+            s1="2020";
+        }
+
     }
+
+    public void reset() {
+
+    }
+
     public static void main(String[] args) {
         // アプリケーションを起動する
         Application.launch(args);
