@@ -118,15 +118,19 @@ public class MovieSearchApp extends Application {
         Movie[] resultMovies=null;
         data.clear();
         list.clear();
+        treeMap.clear();
+        for (int i = 0; i < pieChartData.length; i++) {
+            pieChartData[i]=null;
+        }
         resultMovies= new Movie[101];
         for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
             for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
                 if (movies[i].getYear()==j&&movies[i].getRank()==i){
                     resultMovies[i]=movies[i];
                     data.add(resultMovies[i]);
+                    list.add(String.valueOf(resultMovies[i].getYear()));
                 }
             }
-            list.add(String.valueOf(resultMovies[i].getYear()));
         }
         setPieChartData();
     }
@@ -158,10 +162,12 @@ public class MovieSearchApp extends Application {
         for (String temp : list) {
             Integer count = (Integer) treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
+            System.out.println(temp);
         }
         pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
         treeMap.forEach((key, value) -> {
+            System.out.println(key+"----"+value);
             pieChartData[index[0]] = new PieChart.Data(key, value);
             index[0]++;
         });
