@@ -24,10 +24,10 @@ public class MovieSearchApp extends Application {
     Label toLabel = new Label("      To");
     Label listLabel = new Label("順位");
     Label yearLabel = new Label("公開年");
-    TextField textField1 = new TextField();
-    TextField textField2 = new TextField();
-    TextField textField3 = new TextField();
-    TextField textField4 = new TextField();
+    TextField textField1 = new TextField("");
+    TextField textField2 = new TextField("");
+    TextField textField3 = new TextField("");
+    TextField textField4 = new TextField("");
     HBox hBox1 = new HBox(fromLabel, toLabel);
     HBox hBox2 = new HBox(listLabel, textField1, textField2);
     HBox hBox3 = new HBox(yearLabel, textField3, textField4);
@@ -39,10 +39,13 @@ public class MovieSearchApp extends Application {
     BorderPane bp = new BorderPane();
     TableView table = new TableView();
     ObservableList data = null;
-    TreeSet<String> sites = new TreeSet<String>();
-    //    Iterator<String> itr;
+    Movie[] movies;
     List<String> list = new ArrayList<>();
     int[] frequency;
+    String minRank;
+    String maxRank;
+    String minYear;
+    String maxYear;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -57,21 +60,18 @@ public class MovieSearchApp extends Application {
         hBox3.setAlignment(Pos.CENTER);
         hBox4.setAlignment(Pos.CENTER);
 
-        String minRank = textField1.getText();
-        String maxRank = textField2.getText();
-        String minYear = textField3.getText();
-        String maxYear = textField4.getText();
+
 
         Field f = allData.getField("data");
         String[] initData = (String[]) f.get(MovieData.data);
-        Movie[] movies = new Movie[initData.length];
+        movies = new Movie[initData.length];
 
         for (int i = 0; i < initData.length; i++) {
             String[] arr = initData[i].split(", ");
             movies[i] = new Movie(Integer.parseInt(arr[0]), arr[1], Integer.parseInt(arr[2]));
             list.add(String.valueOf(movies[i].getYear()));
-            data = FXCollections.observableArrayList(movies);
         }
+        data = FXCollections.observableArrayList(movies);
         Map<String, Integer> treeMap = new TreeMap();
         for (String temp : list) {
             Integer count = (Integer) treeMap.get(temp);
@@ -84,8 +84,8 @@ public class MovieSearchApp extends Application {
             index[0]++;
         });
 
-
         searchButton.setOnAction(e->{
+            getValue();
             search(minRank,maxRank,minYear,maxYear);
         });
         resetButton.setOnAction(e->{
@@ -112,25 +112,45 @@ public class MovieSearchApp extends Application {
         stage.setScene(scene);
         stage.show();
     }
-
     public void search(String s1, String s2, String s3, String s4) {
-        if (s1 == null) {
-            s1="1";
+        Movie[] resultMovies=null;
+        data.clear();
+        resultMovies= new Movie[101];
+        for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
+            for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
+                if (movies[i].getYear()==j&&movies[i].getRank()==i){
+                    resultMovies[i]=movies[i];
+                    data.add(resultMovies[i]);
+                }
+            }
         }
-          if (s2 == null) {
-            s1="100";
-        }
-          if (s3 == null) {
-            s1="1975";
-        }
-          if (s4 == null) {
-            s1="2020";
-        }
+
+
 
     }
-
+    public void getValue() {
+        minRank = textField1.getText();
+        maxRank = textField2.getText();
+        minYear = textField3.getText();
+        maxYear = textField4.getText();
+        if (minRank == null||minRank.length()==0) {
+            minRank="1";
+        }
+        if (maxRank == null||maxRank.length()==0) {
+            maxRank="100";
+        }
+        if (minYear == null||minYear.length()==0) {
+            minYear="1975";
+        }
+        if (maxYear == null||maxYear.length()==0) {
+            maxYear="2020";
+        }
+    }
     public void reset() {
-
+        textField1.setText("");
+        textField2.setText("");
+        textField3.setText("");
+        textField4.setText("");
     }
 
     public static void main(String[] args) {
