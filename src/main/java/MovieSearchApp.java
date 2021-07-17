@@ -46,7 +46,8 @@ public class MovieSearchApp extends Application {
     String maxRank;
     String minYear;
     String maxYear;
-
+    PieChart.Data[] pieChartData;
+    Map<String, Integer> treeMap = new TreeMap();
     @Override
     public void start(Stage stage) throws Exception {
         // プログラムを作成
@@ -72,12 +73,13 @@ public class MovieSearchApp extends Application {
             list.add(String.valueOf(movies[i].getYear()));
         }
         data = FXCollections.observableArrayList(movies);
-        Map<String, Integer> treeMap = new TreeMap();
+
+
         for (String temp : list) {
             Integer count = (Integer) treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
         }
-        PieChart.Data[] pieChartData = new PieChart.Data[treeMap.keySet().size()];
+       pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
         treeMap.forEach((key, value) -> {
             pieChartData[index[0]] = new PieChart.Data(key, value);
@@ -115,6 +117,7 @@ public class MovieSearchApp extends Application {
     public void search(String s1, String s2, String s3, String s4) {
         Movie[] resultMovies=null;
         data.clear();
+        list.clear();
         resultMovies= new Movie[101];
         for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
             for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
@@ -123,10 +126,9 @@ public class MovieSearchApp extends Application {
                     data.add(resultMovies[i]);
                 }
             }
+            list.add(String.valueOf(resultMovies[i].getYear()));
         }
-
-
-
+        setPieChartData();
     }
     public void getValue() {
         minRank = textField1.getText();
@@ -152,7 +154,19 @@ public class MovieSearchApp extends Application {
         textField3.setText("");
         textField4.setText("");
     }
+    public void setPieChartData() {
+        for (String temp : list) {
+            Integer count = (Integer) treeMap.get(temp);
+            treeMap.put(temp, (count == null) ? 1 : count + 1);
+        }
+        pieChartData = new PieChart.Data[treeMap.keySet().size()];
+        int[] index = {0};
+        treeMap.forEach((key, value) -> {
+            pieChartData[index[0]] = new PieChart.Data(key, value);
+            index[0]++;
+        });
 
+    }
     public static void main(String[] args) {
         // アプリケーションを起動する
         Application.launch(args);
