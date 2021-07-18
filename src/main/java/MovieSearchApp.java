@@ -47,6 +47,7 @@ public class MovieSearchApp extends Application {
     String minYear;
     String maxYear;
     PieChart.Data[] pieChartData;
+    ObservableList<PieChart.Data> chartData;
     Map<String, Integer> treeMap = new TreeMap();
     @Override
     public void start(Stage stage) throws Exception {
@@ -61,7 +62,8 @@ public class MovieSearchApp extends Application {
         hBox3.setAlignment(Pos.CENTER);
         hBox4.setAlignment(Pos.CENTER);
 
-
+        this.chartData =
+                FXCollections.observableArrayList();
 
         Field f = allData.getField("data");
         String[] initData = (String[]) f.get(MovieData.data);
@@ -119,16 +121,16 @@ public class MovieSearchApp extends Application {
         data.clear();
         list.clear();
         treeMap.clear();
-        for (int i = 0; i < pieChartData.length; i++) {
-            pieChartData[i]=null;
-        }
+//        for (int i = 0; i < pieChartData.length; i++) {
+//            pieChartData[i]=null;
+//        }
         resultMovies= new Movie[101];
         for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
             for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
                 if (movies[i].getYear()==j&&movies[i].getRank()==i){
                     resultMovies[i]=movies[i];
-                    data.add(resultMovies[i]);
                     list.add(String.valueOf(resultMovies[i].getYear()));
+                    data.add(resultMovies[i]);
                 }
             }
         }
@@ -162,17 +164,39 @@ public class MovieSearchApp extends Application {
         for (String temp : list) {
             Integer count = (Integer) treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
-            System.out.println(temp);
+//            System.out.println(temp);
         }
         pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
         treeMap.forEach((key, value) -> {
-            System.out.println(key+"----"+value);
-            pieChartData[index[0]] = new PieChart.Data(key, value);
+//            System.out.println(key+"----"+value);
+            addData(key,value);
+            pieChart.getData().clear();
+//            pieChart.getData().add(chartData);
+
+
             index[0]++;
         });
 
+
+
     }
+
+
+    public void addData(String name, int value)
+    {
+        for(javafx.scene.chart.PieChart.Data d : chartData)
+        {
+            if(d.getName().equals(name))
+            {
+                d.setPieValue(value);
+                return;
+            }
+            System.out.println(d);
+        }
+        chartData.add(new javafx.scene.chart.PieChart.Data(name, value));
+    }
+
     public static void main(String[] args) {
         // アプリケーションを起動する
         Application.launch(args);
