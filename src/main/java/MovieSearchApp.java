@@ -117,13 +117,11 @@ public class MovieSearchApp extends Application {
         stage.show();
     }
     public void search(String s1, String s2, String s3, String s4) {
-        Movie[] resultMovies=null;
+        Movie[] resultMovies;
         data.clear();
         list.clear();
+        chartData.clear();
         treeMap.clear();
-//        for (int i = 0; i < pieChartData.length; i++) {
-//            pieChartData[i]=null;
-//        }
         resultMovies= new Movie[101];
         for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
             for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
@@ -159,27 +157,25 @@ public class MovieSearchApp extends Application {
         textField2.setText("");
         textField3.setText("");
         textField4.setText("");
+        data.clear();
+        list.clear();
+        chartData.clear();
+        treeMap.clear();
+        pieChart.getData().clear();
     }
     public void setPieChartData() {
         for (String temp : list) {
-            Integer count = (Integer) treeMap.get(temp);
+            Integer count = treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
-//            System.out.println(temp);
         }
         pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
         treeMap.forEach((key, value) -> {
-//            System.out.println(key+"----"+value);
             addData(key,value);
-            pieChart.getData().clear();
-//            pieChart.getData().add(chartData);
-
-
             index[0]++;
         });
-
-
-
+        pieChart.getData().clear();
+        pieChart.getData().addAll(chartData);
     }
 
 
@@ -192,7 +188,6 @@ public class MovieSearchApp extends Application {
                 d.setPieValue(value);
                 return;
             }
-            System.out.println(d);
         }
         chartData.add(new javafx.scene.chart.PieChart.Data(name, value));
     }
