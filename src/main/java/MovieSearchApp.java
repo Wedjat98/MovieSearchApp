@@ -20,8 +20,8 @@ public class MovieSearchApp extends Application {
     public static String gakuban = "19EC601"; // 学籍番号を入力すること
     public static String yourname = "サイホウリン"; // 氏名を入力すること
     Class allData = MovieData.class;
-    Label fromLabel = new Label("From        ");
-    Label toLabel = new Label("      To");
+    Label fromLabel = new Label("From           ");
+    Label toLabel = new Label("         To");
     Label listLabel = new Label("順位");
     Label yearLabel = new Label("公開年");
     TextField textField1 = new TextField("");
@@ -41,7 +41,8 @@ public class MovieSearchApp extends Application {
     ObservableList data = null;
     Movie[] movies;
     List<String> list = new ArrayList<>();
-    int[] frequency;
+    Alert alert = new Alert(Alert.AlertType.ERROR, "入力した数字、もう一度チェックしてください！");
+
     String minRank;
     String maxRank;
     String minYear;
@@ -49,6 +50,7 @@ public class MovieSearchApp extends Application {
     PieChart.Data[] pieChartData;
     ObservableList<PieChart.Data> chartData;
     Map<String, Integer> treeMap = new TreeMap();
+
     @Override
     public void start(Stage stage) throws Exception {
         // プログラムを作成
@@ -78,21 +80,21 @@ public class MovieSearchApp extends Application {
 
 
         for (String temp : list) {
-            Integer count = (Integer) treeMap.get(temp);
+            Integer count = treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
         }
-       pieChartData = new PieChart.Data[treeMap.keySet().size()];
+        pieChartData = new PieChart.Data[treeMap.keySet().size()];
         int[] index = {0};
         treeMap.forEach((key, value) -> {
             pieChartData[index[0]] = new PieChart.Data(key, value);
             index[0]++;
         });
 
-        searchButton.setOnAction(e->{
+        searchButton.setOnAction(e -> {
             getValue();
-            search(minRank,maxRank,minYear,maxYear);
+            search(minRank, maxRank, minYear, maxYear);
         });
-        resetButton.setOnAction(e->{
+        resetButton.setOnAction(e -> {
             reset();
         });
 
@@ -116,42 +118,49 @@ public class MovieSearchApp extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
     public void search(String s1, String s2, String s3, String s4) {
         Movie[] resultMovies;
         data.clear();
         list.clear();
         chartData.clear();
         treeMap.clear();
-        resultMovies= new Movie[101];
-        for (int i = Integer.parseInt(s1); i < Integer.parseInt(s2)+1; i++) {
-            for (int j = Integer.parseInt(s3); j <Integer.parseInt(s4)+1 ; j++) {
-                if (movies[i].getYear()==j&&movies[i].getRank()==i){
-                    resultMovies[i]=movies[i];
-                    list.add(String.valueOf(resultMovies[i].getYear()));
-                    data.add(resultMovies[i]);
+        resultMovies = new Movie[movies.length];
+        try {
+            for (int i = (Integer.parseInt(s1) - 1); i < Integer.parseInt(s2); i++) {
+                for (int j = Integer.parseInt(s3); j < Integer.parseInt(s4) + 1; j++) {
+                    if (movies[i].getYear() == j && movies[i].getRank() == i + 1) {
+                        resultMovies[i] = movies[i];
+                        list.add(String.valueOf(resultMovies[i].getYear()));
+                        data.add(resultMovies[i]);
+                    }
                 }
             }
+        } catch (Exception e) {
+            alert.showAndWait();
         }
         setPieChartData();
     }
+
     public void getValue() {
         minRank = textField1.getText();
         maxRank = textField2.getText();
         minYear = textField3.getText();
         maxYear = textField4.getText();
-        if (minRank == null||minRank.length()==0) {
-            minRank="1";
+        if (minRank == null || minRank.length() == 0) {
+            minRank = "1";
         }
-        if (maxRank == null||maxRank.length()==0) {
-            maxRank="100";
+        if (maxRank == null || maxRank.length() == 0) {
+            maxRank = "100";
         }
-        if (minYear == null||minYear.length()==0) {
-            minYear="1975";
+        if (minYear == null || minYear.length() == 0) {
+            minYear = "1975";
         }
-        if (maxYear == null||maxYear.length()==0) {
-            maxYear="2020";
+        if (maxYear == null || maxYear.length() == 0) {
+            maxYear = "2020";
         }
     }
+
     public void reset() {
         textField1.setText("");
         textField2.setText("");
@@ -163,28 +172,24 @@ public class MovieSearchApp extends Application {
         treeMap.clear();
         pieChart.getData().clear();
     }
+
     public void setPieChartData() {
         for (String temp : list) {
             Integer count = treeMap.get(temp);
             treeMap.put(temp, (count == null) ? 1 : count + 1);
         }
         pieChartData = new PieChart.Data[treeMap.keySet().size()];
-        int[] index = {0};
         treeMap.forEach((key, value) -> {
-            addData(key,value);
-            index[0]++;
+            addData(key, value);
         });
         pieChart.getData().clear();
         pieChart.getData().addAll(chartData);
     }
 
 
-    public void addData(String name, int value)
-    {
-        for(javafx.scene.chart.PieChart.Data d : chartData)
-        {
-            if(d.getName().equals(name))
-            {
+    public void addData(String name, int value) {
+        for (javafx.scene.chart.PieChart.Data d : chartData) {
+            if (d.getName().equals(name)) {
                 d.setPieValue(value);
                 return;
             }
@@ -200,8 +205,9 @@ public class MovieSearchApp extends Application {
 }
 
 /* 考察 -- 調査したこと、考慮したこと、工夫したことを記述
-
-
-
-
+1.MovieDataを導入した時にリフレクションを使いました。そして入力したDataをStringのsplitメソードを使って、二次元配列になりました。
+2.Listに全てのMovieDataの年のDataを保存されています。
+3.「キー」と「値」の組によって扱うことのできるようにtreeMapを使いました。ここではtreeMapにデータを保存する時には
+キーの重複を許さない点からcountという変数を使って、重複した年はcountに数えています。そして、pieChartに反映されています。
+4.検索機能は2重for文で繰り返し構造の中で、さらに繰り返し処理を行いました。こういう操作で新しい配列resultMoviesにDataは入力しています。
  */
